@@ -1,0 +1,127 @@
+.search-icon {
+    color: gray;
+    font-size: 20px;
+}
+
+.search-icon:hover {
+    color: #0056b3;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.paragraph-text {
+    border-left: 5px solid blue;
+    padding-left: 15px;
+    color: gray;
+}
+
+.repo-card {
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.input-field {
+    display: flex;
+    justify-content: space-between;
+}
+
+.repo-detail-card {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card-detail {
+    margin: 15px;
+    width: 350px;
+}
+
+.repo-lang {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.repo-lang-dot {
+    display: inline-block;
+    width: 12px;
+    /* similar to w-3 */
+    height: 12px;
+    /* similar to h-3 */
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.repo-header {
+    display: flex;
+    justify-content: space-between;
+    /* align-items: flex-start; */
+    margin-bottom: 8px;
+}
+
+.repo-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2563eb;
+    /* blue-600 */
+    cursor: pointer;
+    margin: 0;
+    text-decoration: none;
+}
+
+.repo-title:hover {
+    text-decoration: underline;
+}
+
+.repo-fav-btn {
+    font-size: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Filled star */
+.icon-star-filled {
+    color: gold;
+}
+
+/* Empty star with hover */
+.icon-star-empty {
+    color: #9ca3af;
+    /* gray-400 */
+}
+
+.icon-star-empty:hover {
+    color: #facc15;
+    /* yellow-500 */
+}
+
+.back-button {
+    color: #2563eb;
+}
+
+.back-button:hover {
+    color: #0056b3;
+}
+
+.repo-paragraph {
+    color: gray;
+    font-size: 16px;
+    border-left: 5px solid blue;
+    padding-left: 15px;
+}
+
+.smiley {
+    font-size: 1.875rem;
+    /* margin-bottom: 0.25rem; */
+    color: gray;
+    margin: 0;
+}
+
+.commits-card{
+    width: 150px;
+    height: 150px;
+}
