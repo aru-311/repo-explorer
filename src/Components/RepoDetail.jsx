@@ -43,12 +43,12 @@ export default function RepoDetail() {
   const { logininfo, reponame } = useParams();
   const { selectedRepo } = useSelector((state) => state.gitRepoSlice);
   useEffect(() => {
-    // dispatch(getRepoInfoThunks({ owner: logininfo, repo: reponame }));
-    // dispatch(getContributorsThunks({ owner: logininfo, repo: reponame }));
-    // dispatch(getRepoIssuesThunks({ owner: logininfo, repo: reponame }));
-    // dispatch(getReadmeThunks({ owner: logininfo, repo: reponame }));
-    // dispatch(getRepoCommitActivityThunks({ owner: logininfo, repo: reponame }));
-    // dispatch(getRepoLanguagesThunks({ owner: logininfo, repo: reponame }));
+    dispatch(getRepoInfoThunks({ owner: logininfo, repo: reponame }));
+    dispatch(getContributorsThunks({ owner: logininfo, repo: reponame }));
+    dispatch(getRepoIssuesThunks({ owner: logininfo, repo: reponame }));
+    dispatch(getReadmeThunks({ owner: logininfo, repo: reponame }));
+    dispatch(getRepoCommitActivityThunks({ owner: logininfo, repo: reponame }));
+    dispatch(getRepoLanguagesThunks({ owner: logininfo, repo: reponame }));
 
     return () => {
       dispatch(clearSelectedRepo()); // cleanup on unmount
