@@ -1,8 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleFavorite } from "../slice/githubApiSlice";
+import AppBar from "./AppBar";
 export default function Favourites() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { repositories, favorites } = useSelector(
+    (state) => state.gitRepoSlice
+  );
+  localStorage.setItem("fav", JSON.stringify(favorites));
+
+  const favItems = JSON.parse(localStorage.getItem("fav"));
+  const filteredArr = repositories.filter((item) => favorites.length>0 ? favorites.includes(item.id) : favItems.includes(item.id));
   const MOCK_REPOS = [
     {
       id: 1,
@@ -111,64 +122,69 @@ export default function Favourites() {
     Shell: "#89e051",
     YAML: "#9e8b7e",
   };
-  const [favorites, setFavorites] = useState([]);
-
-  const toggleFavorite = (id) => {
-    setFavorites(
-      (prev) =>
-        prev.includes(id)
-          ? prev.filter((favId) => favId !== id) // remove if already favorite
-          : [...prev, id] // add if not favorite
-    );
+  const handleRepoClick = useCallback(
+    (repoName) => {
+      navigate(`/${repoName}`);
+    },
+    [navigate]
+  );
+  const handleFavoriteClick = (id) => {
+    dispatch(toggleFavorite(id));
   };
 
   return (
-    <div>
-      <h2>Your Favorite Repositories</h2>
-      <p className="paragraph-text">
-        This curated list contains all the projects you've marked as a favorite.
-        This feature supports the information architecture's goal of retention
-        and quick access to high-value content.
-      </p>
-      <div className="repo-detail-card">
-        {MOCK_REPOS.map((item, index) => {
-          const isFavorite = favorites.includes(item.id);
-          return (
-            <Card key={index} className="card-detail">
-              <div className="repo-header">
-                <h2
-                  className="repo-title"
-                  onClick={() => navigate(`/${item.name}`)}
+    <div className="app-container">
+      <AppBar />
+      <div className="repo-body repo-card">
+        <h2>Your Favorite Repositories</h2>
+        <p className="paragraph-text">
+          This curated list contains all the projects you've marked as a
+          favorite. This feature supports the information architecture's goal of
+          retention and quick access to high-value content.
+        </p>
+        <div className="repo-detail-card">
+          {filteredArr?.map((item) => {
+            const isFavorite = favorites.includes(item.id);
+            return (
+              <Card key={item.id} className="card-detail">
+                <div className="repo-header">
+                  <h2
+                    className="repo-title"
+                    onClick={() => handleRepoClick(item.name)}
+                  >
+                    {item.name}
+                  </h2>
+                  <button
+                    className={`repo-fav-btn ${
+                      isFavorite ? "icon-star-filled" : "icon-star-empty"
+                    }`}
+                    onClick={() => handleFavoriteClick(item.id)}
+                  >
+                    &#9733;
+                  </button>
+                </div>
+                <p>{item.description}</p>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  {item.name}
-                </h2>
-                <button
-                  className={`repo-fav-btn ${
-                    isFavorite ? "icon-star-filled" : "icon-star-empty"
-                  }`}
-                  onClick={() => toggleFavorite(item.id)}
-                >
-                  &#9733;
-                </button>
-              </div>
-              <p>{item.description}</p>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span className="repo-lang">
-                  <span
-                    className="repo-lang-dot"
-                    style={{
-                      backgroundColor: LANGUAGE_COLORS[item.language] || "#ccc",
-                    }}
-                  ></span>
-                  {item.language}
-                </span>
-                <p style={{ margin: 0 }}>&#9733; {item.stars}</p>
-                <p style={{ margin: 0 }}>&#127803; {item.forks}</p>
-                <p style={{ margin: 0 }}>&#9888; {item.issues}</p>
-              </div>
-            </Card>
-          );
-        })}
+                  <span className="repo-lang">
+                    <span
+                      className="repo-lang-dot"
+                      style={{
+                        backgroundColor:
+                          LANGUAGE_COLORS[item.language] || "#ccc",
+                      }}
+                    ></span>
+                    {item.language}
+                  </span>
+                  <p style={{ margin: 0 }}>&#9733; {item.stargazers_count}</p>
+                  <p style={{ margin: 0 }}>&#127803; {item.forks}</p>
+                  <p style={{ margin: 0 }}>&#9888; {item.open_issues}</p>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

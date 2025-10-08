@@ -1,5 +1,6 @@
 import { Card } from "antd";
 import AppBar from "./AppBar";
+import React, { useState, useEffect } from "react";
 import "./AppBar.css";
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
@@ -12,6 +13,21 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import {
+  getRepoInfoThunks,
+  getContributorsThunks,
+  getRepoIssuesThunks,
+  getReadmeThunks,
+  getRepoCommitActivityThunks,
+  getRepoLanguagesThunks,
+} from "../thunks/gitHubApiThunks";
+import { clearSelectedRepo } from "../slice/githubApiSlice";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -21,22 +37,98 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
 export default function RepoDetail() {
-  const labels = ["Red", "Blue", "Yellow", "Green"];
+  const dispatch = useDispatch();
+  const { logininfo, reponame } = useParams();
+  const { selectedRepo } = useSelector((state) => state.gitRepoSlice);
+  useEffect(() => {
+    // dispatch(getRepoInfoThunks({ owner: logininfo, repo: reponame }));
+    // dispatch(getContributorsThunks({ owner: logininfo, repo: reponame }));
+    // dispatch(getRepoIssuesThunks({ owner: logininfo, repo: reponame }));
+    // dispatch(getReadmeThunks({ owner: logininfo, repo: reponame }));
+    // dispatch(getRepoCommitActivityThunks({ owner: logininfo, repo: reponame }));
+    // dispatch(getRepoLanguagesThunks({ owner: logininfo, repo: reponame }));
+
+    return () => {
+      dispatch(clearSelectedRepo()); // cleanup on unmount
+    };
+  }, [dispatch, logininfo, reponame]);
+
+  const {
+    repoInfo = {},
+    contributors = [],
+    issues = [],
+    readme = null,
+    loading,
+    error,
+    languages = {},
+    commitActivity = [],
+  } = selectedRepo;
+
+
+  const {
+    id,
+    name,
+    full_name,
+    isPrivate,
+    ownerLogin,
+    ownerAvatar,
+    ownerHtml,
+    html_url,
+    description,
+    language,
+    stargazers_count,
+    forks_count,
+    open_issues_count,
+    licenseName,
+    licenseUrl,
+    default_branch,
+    homepage,
+  } = repoInfo || {};
+
+  function commitFormatter(data) {
+    let weekInfo = [];
+    let commitCount = [];
+
+    data?.forEach((item) => {
+      weekInfo.push(item.weekStart);
+      commitCount.push(item.totalCommits);
+    });
+
+    return { weekInfo, commitCount };
+  }
+  const { weekInfo, commitCount } = commitFormatter(commitActivity);
+
+  const labels = Object.keys(languages || {});
 
   const data = {
     labels,
     datasets: [
       {
         label: "Votes",
-        data: [12, 19, 3, 5],
+        data: Object.values(languages || {}),
         backgroundColor: [
-          "rgba(255, 99, 132, 0.7)",
-          "rgba(54, 162, 235, 0.7)",
-          "rgba(255, 206, 86, 0.7)",
-          "rgba(75, 192, 192, 0.7)",
-        //   "rgba(153, 102, 255, 0.7)",
-        //   "rgba(255, 159, 64, 0.7)",
+          "#6680B3", // steel blue
+          "#80B300", // olive green
+          "#809900", // dark lime
+          "#E6B3B3", // pinkish
+          "#66991A", // green
+          "#FF99E6", // pink
+          "#CCFF1A", // neon green
+          "#FF1A66", // hot pink
+          "#E6331A", // red orange
+          "#33FFCC", // aqua
+          "#FF6633", // orange
+          "#FFB399", // peach
+          "#FF33FF", // magenta
+          "#FFFF99", // light yellow
+          "#00B3E6", // sky blue
+          "#E6B333", // mustard
+          "#3366E6", // blue
+          "#999966", // khaki
+          "#99FF99", // light green
+          "#B34D4D", // red brown
         ],
         borderColor: ["#fff"],
         borderWidth: 2,
@@ -45,11 +137,11 @@ export default function RepoDetail() {
   };
   // Bar chart data
   const barData = {
-    labels,
+    labels: weekInfo,
     datasets: [
       {
-        label: "",
-        data: [12, 19, 3, 5, 2, 3],
+        label: "sample",
+        data: commitCount[1] === 0 ? [2, 4, 6, 8, 10] : commitCount,
         backgroundColor: "rgba(54, 162, 235, 0.7)",
       },
     ],
@@ -73,85 +165,115 @@ export default function RepoDetail() {
     },
   };
 
-  const contributorsArr = [
-    { name: "Arundhathi", commits: 56 },
-    { name: "sample", commits: 56 },
-    { name: "user", commits: 56 },
-    { name: "rewe", commits: 56 },
-  ];
-
+  const LANGUAGE_COLORS = {
+    JavaScript: "#f1e05a",
+    "C++": "#f34b7d",
+    HTML: "#e34c26",
+    TypeScript: "#2b7489",
+    Python: "#3572A5",
+    CSS: "#563d7c",
+    CMake: "#DAE4A9",
+    Rust: "#dea584",
+    Documentation: "#654C43",
+    Shell: "#89e051",
+    YAML: "#9e8b7e",
+    Dart: "#654C41",
+  };
   return (
-    <div>
+    <div className="app-container">
       <AppBar />
-      <div className="back-button">
-        {" "}
-        <span style={{ marginRight: 5 }}>←</span>Back to Search
-      </div>
-      <Card>
-        <h2>Quantum-Solver</h2>
-        <h3>
-          A highly optimized quantum simulation library for educational
-          purposes.
-        </h3>
-        <div style={{ display: "flex" }}>
-          <span className="repo-lang">
-            <span
-            //   className="repo-lang-dot"
-            //   style={{
-            //     backgroundColor: LANGUAGE_COLORS[item.language] || "#ccc",
-            //   }}
-            ></span>
-            C++
-          </span>
-          <p style={{ margin: 5 }}>&#9733; 788</p>
-          <p style={{ margin: 5 }}>&#9888; 5667 Open Issues</p>
-          <h2 className="search-icon">
-            <span>&#10084;</span>Add to Favorites
-          </h2>
-        </div>
-        <h2>In-Depth Analysis</h2>
-        <hr />
-        <p className="repo-paragraph">
-          This section provides a deeper look into the repository's activity and
-          composition, helping you understand its maturity, development pace,
-          and technical stack.
-        </p>
-        <div style={{ display: "flex" }}>
+      <div className="repo-body repo-card">
+        {/* <div className="back-button">
+          {" "}
+          <span style={{ marginRight: 5 }}>←</span>Back to Search
+        </div> */}
+        {!repoInfo ? (
+          <>
+            <Skeleton />
+            <Skeleton count={10} />
+          </>
+        ) : (
           <Card>
-            <h2>Language Distribution</h2>
-            <p>
-              A proportional breakdown of the codebase by primary languages,
-              indicating the technological complexity and focus.
-            </p>
-            <Doughnut data={data} />
-          </Card>
-          <Card>
-            <h2>Weekly Commit Activity</h2>
-            <p>
-              The number of commits over the last four weeks, serving as a proxy
-              for the project's development pace and maintainer engagement.
-            </p>
-            <Bar data={barData} options={barOptions} />
-          </Card>
-        </div>
-        <h2>Top Contributors</h2>
-        <hr />
-        <p>
-          Key individuals who drive the project forward, measured by their total
-          contribution count.
-        </p>
-        <div style={{ display: "flex", justifyContent:'space-evenly' }}>
-          {contributorsArr.map((item, index) => {
-            return (
-              <Card key={index} className="commits-card">
-                <p className="smiley">☺</p>
-                <p style={{margin:0}}>{item.name}</p>
-                <p style={{margin:0}}>{item.commits} commits</p>
+            <h2>{name}</h2>
+            <h3>
+              A highly optimized quantum simulation library for educational
+              purposes.
+            </h3>
+            <div style={{ display: "flex" }}>
+              <p className="repo-lang" style={{ marginTop: "0px" }}>
+                <span
+                  className="repo-lang-dot"
+                  style={{
+                    backgroundColor: LANGUAGE_COLORS[language] || "#ccc",
+                  }}
+                ></span>
+                {language}
+              </p>
+              <p style={{ margin: 5 }}>&#9733; {stargazers_count}</p>
+              <p style={{ margin: 5 }}>
+                &#9888; {open_issues_count} Open Issues
+              </p>
+              <h2 className="search-icon" style={{ marginTop: "0px" }}>
+                <span>&#10084;</span>Add to Favorites
+              </h2>
+            </div>
+            <h2>{name}</h2>
+            <hr />
+            <p className="repo-paragraph">{description}</p>
+            <div style={{ display: "flex" }}>
+              <Card style={{ margin: 5 }}>
+                <h2>Language Distribution</h2>
+                <p>
+                  A proportional breakdown of the codebase by primary languages,
+                  indicating the technological complexity and focus.
+                </p>
+                <Doughnut data={data} />
               </Card>
-            );
-          })}
-        </div>
-      </Card>
+              <Card style={{ margin: 5 }}>
+                <h2>Weekly Commit Activity</h2>
+                <p>
+                  The number of commits over the last four weeks, serving as a
+                  proxy for the project's development pace and maintainer
+                  engagement.
+                </p>
+                <Bar data={barData} options={barOptions} />
+              </Card>
+            </div>
+            <h2>Top Contributors</h2>
+            <hr />
+            <p>
+              Key individuals who drive the project forward, measured by their
+              total contribution count.
+            </p>
+            <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+              {contributors?.map((item, index) => {
+                return (
+                  <Card key={index} className="commits-card">
+                    {item.avatar_url ? (
+                      <img
+                        src={item.avatar_url}
+                        style={{
+                          width: "45px",
+                          height: "45px",
+                          borderRadius: "25px",
+                        }}
+                      />
+                    ) : (
+                      <p className="smiley">☺</p>
+                    )}
+                    <p style={{ margin: 0 }}>
+                      <a href={item.html_url} target="_blank">
+                        {item.login}
+                      </a>
+                    </p>
+                    <p style={{ margin: 0 }}>{item.contributions === 0 || 1 ? '1 commit' :` ${item.contributions} commits` }</p>
+                  </Card>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

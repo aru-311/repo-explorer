@@ -7,13 +7,11 @@ import Favourites from "./Components/Favourites";
 function App() {
   return (
     <Router>
-      {/* <div className="App"> */}
         <Routes>
           <Route path="/" element={<RepoCard />} />
-          <Route path="/:name" element={<RepoDetail />} />
+          <Route path="/:logininfo/:reponame" element={<RepoDetail />} />
           <Route path='/favourites' element={<Favourites/>}/>
         </Routes>
-      {/* </div> */}
     </Router>
   );
 }
