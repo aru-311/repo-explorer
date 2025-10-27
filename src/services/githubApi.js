@@ -1,5 +1,5 @@
 import axios from "axios";
-import {formatDate} from "../Utils/Date_Formatter";
+import { formatDate } from "../Utils/Date_Formatter";
 
 const GITHUB_API_BASE_URL = "https://api.github.com";
 
@@ -60,7 +60,8 @@ export const getRepoIssues = async (owner, repo) => {
 export const getReadme = async (owner, repo) => {
   try {
     const response = await axios.get(
-      `https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`
+      // `https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`
+      `https://raw.githubusercontent.com/vig31/scribe-my-notes/main/README.md`
     );
     return response.data;
   } catch (error) {
@@ -100,6 +101,61 @@ export const getRepoCommitActivity = async (owner, repo) => {
       `Error fetching commit activity for ${owner}/${repo}:`,
       error
     );
+    throw error;
+  }
+};
+
+export const fetchRepositoriesByNodeIds = async (nodeIds) => {
+  try {
+    console.log(nodeIds);
+    const query = `
+    query {
+      nodes(ids: ${JSON.stringify(nodeIds)}) {
+        ... on Repository {
+          id
+          name
+          nameWithOwner
+          description
+          stargazerCount
+          forkCount
+          url
+          openIssues: issues(states: OPEN) {
+          totalCount
+        }
+          languages(first: 3, orderBy: {field: SIZE, direction: DESC}) {
+          edges {
+            node {
+              name
+            }
+            size
+          }
+        }
+          primaryLanguage {
+          name
+          color
+        }
+          owner {
+            login
+            avatarUrl
+          }
+        }
+      }
+    }
+  `;
+
+    const response = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.REACT_APP_GITHUB_TOKEN}`,
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    const data = await response.json();
+    return data.data.nodes.filter(Boolean); // some might be null if invalid ID
+  } catch (error) {
+    console.error("Error fetching repos for", error);
     throw error;
   }
 };

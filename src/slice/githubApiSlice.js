@@ -9,14 +9,15 @@ import {
   getReadmeThunks,
   getRepoLanguagesThunks,
   getRepoCommitActivityThunks,
+  getFavoriteRepos,
 } from "../thunks/gitHubApiThunks";
 
-const initialState = {
+export const initialState = {
   repositories: [],
   totalCount: 0,
   query: "",
   pageNumber: 1,
-  favorites: [], // For homepage cards
+  favourites: [], // For homepage cards
   selectedRepo: {
     // For repo detail page
     repoInfo: null,
@@ -36,9 +37,6 @@ const githubSlice = createSlice({
   name: "gitRepoSlice",
   initialState,
   reducers: {
-    /**
-     * Clear selected repo detail
-     */
     setQuery: (state, action) => {
       state.query = action.payload;
     },
@@ -47,10 +45,10 @@ const githubSlice = createSlice({
     },
     toggleFavorite: (state, action) => {
       const id = action.payload;
-      if (state.favorites.includes(id)) {
-        state.favorites = state.favorites.filter((favId) => favId !== id);
+      if (state.favourites.includes(id)) {
+        state.favourites = state.favourites.filter((favId) => favId !== id);
       } else {
-        state.favorites.push(id);
+        state.favourites.push(id);
       }
     },
     clearSelectedRepo: (state) => {
@@ -169,8 +167,23 @@ const githubSlice = createSlice({
         state.selectedRepo.loading = false;
         state.selectedRepo.error = action.error.message;
       });
+
+    builder
+      .addCase(getFavoriteRepos.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getFavoriteRepos.fulfilled, (state, action) => {
+        state.loading = false;
+        state.favourites = action.payload; // store repo details instead of just IDs
+      })
+      .addCase(getFavoriteRepos.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 
-export const { setQuery, setPageNumber, toggleFavorite, clearSelectedRepo } = githubSlice.actions;
+export const { setQuery, setPageNumber, toggleFavorite, clearSelectedRepo } =
+  githubSlice.actions;
 export default githubSlice.reducer;

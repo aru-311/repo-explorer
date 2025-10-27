@@ -8,6 +8,7 @@ import {
   getReadme,
   getRepoCommitActivity,
   getRepoLanguages,
+  fetchRepositoriesByNodeIds,
 } from "../services/githubApi.js";
 
 export const getRepositoriesThunks = createAsyncThunk(
@@ -56,5 +57,13 @@ export const getRepoCommitActivityThunks = createAsyncThunk(
   "gitRepoSlice/getRepoCommitActivity",
   async ({ owner, repo }) => {
     return await getRepoCommitActivity(owner, repo);
+  }
+);
+
+export const getFavoriteRepos = createAsyncThunk(
+  "githubApi/getFavoriteRepos",
+  async (nodeIds) => {
+    const data = await fetchRepositoriesByNodeIds(nodeIds);
+    return data;
   }
 );

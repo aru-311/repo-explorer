@@ -1,7 +1,7 @@
 import "./AppBar.css";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../themes";
-import { FaMoon, FaSun } from "react-icons/fa";
+// import { FaMoon, FaSun } from "react-icons/fa";
 
 export default function AppBar() {
   const { theme, toggleTheme } = useTheme();
@@ -29,12 +29,12 @@ export default function AppBar() {
           }}
           aria-label="Toggle theme"
         >
-          <p style={{margin:'-5px 10px 5px 10px'}}>
+          <p style={{margin:'-11px 10px 5px 10px'}}>
           {theme === "light" ? "🌙": "🔆"}
           </p>
         </button>
 
-        <h2 className="search-icon">
+        <h2 className="search-icon" onClick={() => navigate("/")}>
           <span>&#128269;</span> Search
         </h2>
         <h2 className="search-icon" onClick={() => navigate("/favourites")}>

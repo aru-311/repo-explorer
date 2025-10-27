@@ -9,19 +9,14 @@ import {
   setPageNumber,
   toggleFavorite,
 } from "../slice/githubApiSlice";
-import { getRepositoriesThunks } from "../thunks/gitHubApiThunks";
+import { getFavoriteRepos, getRepositoriesThunks } from "../thunks/gitHubApiThunks";
 import { debounce } from "lodash";
 
 export default function RepoCard() {
   const dispatch = useDispatch();
-  const {
-    query,
-    repositories,
-    totalCount,
-    pageNumber,
-    favorites,
-    loading,
-  } = useSelector((state) => state.gitRepoSlice);
+  const { query, repositories=[], totalCount, pageNumber, favourites=[], loading } =
+    useSelector((state) => state.gitRepoSlice);
+
   const navigate = useNavigate();
 
   const LANGUAGE_COLORS = {
@@ -59,6 +54,15 @@ export default function RepoCard() {
     };
   }, [debouncedSearch]);
 
+  // const localData = JSON.parse(sessionStorage.getItem("repositories"));
+  // useEffect(() => {
+  //   const stored = JSON.parse(sessionStorage.getItem("repositories"));
+  //   const nodeIds = stored?.map((item) => item) || [];
+  //   if (nodeIds.length) {
+  //     dispatch(getFavoriteRepos(nodeIds));
+  //   }
+  // }, [dispatch]);
+
   const handleQueryChange = (e) => {
     const value = e.target.value;
     dispatch(setQuery(value));
@@ -66,7 +70,7 @@ export default function RepoCard() {
   };
 
   const handleRepoClick = useCallback(
-    (logininfo,repoName) => {
+    (logininfo, repoName) => {
       navigate(`/${logininfo}/${repoName}`);
     },
     [navigate]
@@ -104,14 +108,14 @@ export default function RepoCard() {
           />
         </div>
         <div className="repo-detail-card">
-          {repositories.map((item) => {
-            const isFavorite = favorites.includes(item.id);
+          {repositories?.map((item) => {
+            const isFavorite = favourites.some((fav) => fav.id === item.node_id || fav === item.node_id);
             return (
               <Card key={item.id} className="card-detail">
                 <div className="repo-header">
                   <h2
                     className="repo-title"
-                    onClick={() => handleRepoClick(item.owner.login,item.name)}
+                    onClick={() => handleRepoClick(item.owner.login, item.name)}
                   >
                     {item.name}
                   </h2>
@@ -119,7 +123,7 @@ export default function RepoCard() {
                     className={`repo-fav-btn ${
                       isFavorite ? "icon-star-filled" : "icon-star-empty"
                     }`}
-                    onClick={() => handleFavoriteClick(item.id)}
+                    onClick={() => handleFavoriteClick(item.node_id)}
                   >
                     &#9733;
                   </button>
