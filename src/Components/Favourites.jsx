@@ -5,12 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFavorite } from "../slice/githubApiSlice";
 import AppBar from "./AppBar";
 import { getFavoriteRepos } from "../thunks/gitHubApiThunks";
-import { Oval  } from "react-loader-spinner";
 
 export default function Favourites() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { repositories, favourites = [] } = useSelector(
+  const { favourites = [] } = useSelector(
     (state) => state.gitRepoSlice
   );
   const localData = JSON.parse(localStorage.getItem("favourites"));
@@ -56,8 +55,7 @@ export default function Favourites() {
           retention and quick access to high-value content.
         </p>
         <div className="repo-detail-card">
-          {favourites.length > 0 ? (
-            favourites?.map((item) => {
+          {favourites?.map((item) => {
               const isFavorite = localData?.some(
                 (fav) => fav?.id === item?.id || fav === item?.id
               );
@@ -103,17 +101,6 @@ export default function Favourites() {
                 </Card>
               );
             })
-          ) : 
-          (
-            // <Oval 
-            //   height="70"
-            //   width="70"
-            //   radius="5"
-            //   color="green"
-            //   ariaLabel="loading"
-            // />
-            <div></div>
-          )
           }
         </div>
       </div>

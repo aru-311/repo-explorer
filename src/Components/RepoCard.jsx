@@ -1,18 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./AppBar.css";
 import { Input, Select, Card } from "antd";
 import { useNavigate } from "react-router-dom";
 import AppBar from "./AppBar";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setQuery,
-  setPageNumber,
-  toggleFavorite,
-} from "../slice/githubApiSlice";
-import {
-  getFavoriteRepos,
-  getRepositoriesThunks,
-} from "../thunks/gitHubApiThunks";
+import { setQuery, toggleFavorite } from "../slice/githubApiSlice";
+import { getRepositoriesThunks } from "../thunks/gitHubApiThunks";
 import { debounce } from "lodash";
 
 export default function RepoCard() {
@@ -20,10 +13,7 @@ export default function RepoCard() {
   const {
     query,
     repositories = [],
-    totalCount,
-    pageNumber,
     favourites = [],
-    loading,
     languageSet = [],
   } = useSelector((state) => state.gitRepoSlice);
 
@@ -48,16 +38,17 @@ export default function RepoCard() {
   };
 
   // Debounced search for query changes
-  const debouncedSearch = useCallback(
-    debounce((value) => {
-      dispatch(
-        getRepositoriesThunks({
-          query: value,
-          count_per_page: 20,
-          page_number: 1,
-        })
-      );
-    }, 500),
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value) => {
+        dispatch(
+          getRepositoriesThunks({
+            query: value,
+            count_per_page: 20,
+            page_number: 1,
+          })
+        );
+      }, 500),
     [dispatch]
   );
 
@@ -79,7 +70,7 @@ export default function RepoCard() {
 
   const handleFilters = (value) => {
     setSelectedLang(value);
-    if (value && value != "Select Language") {
+    if (value && value !== "Select Language") {
       setInternalRepo(repositories.filter((item) => item.language === value));
     } else {
       setInternalRepo(repositories);
@@ -115,7 +106,9 @@ export default function RepoCard() {
           />
           <Select
             defaultValue="Filter by Languages"
-            value={selectedLang?.length>0 ? selectedLang:"Filter by Languages"}
+            value={
+              selectedLang?.length > 0 ? selectedLang : "Filter by Languages"
+            }
             style={{ width: 200, height: 40, marginLeft: 20 }}
             onChange={(value) => handleFilters(value)}
             options={languageSet}

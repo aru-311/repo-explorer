@@ -1,6 +1,6 @@
 import { Card } from "antd";
 import AppBar from "./AppBar";
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import "./AppBar.css";
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
@@ -43,7 +43,6 @@ export default function RepoDetail() {
   const { selectedRepo, favourites = [] } = useSelector(
     (state) => state.gitRepoSlice
   );
-  const [favoriteItems, setFavoriteIems] = useState([]);
   useEffect(() => {
     dispatch(getRepoInfoThunks({ owner: logininfo, repo: reponame }));
     dispatch(getContributorsThunks({ owner: logininfo, repo: reponame }));
@@ -51,7 +50,6 @@ export default function RepoDetail() {
     dispatch(getReadmeThunks({ owner: logininfo, repo: reponame }));
     dispatch(getRepoCommitActivityThunks({ owner: logininfo, repo: reponame }));
     dispatch(getRepoLanguagesThunks({ owner: logininfo, repo: reponame }));
-    setFavoriteIems(localStorage.getItem("favourites"));
     return () => {
       dispatch(clearSelectedRepo()); // cleanup on unmount
     };
@@ -60,33 +58,17 @@ export default function RepoDetail() {
   const {
     repoInfo = {},
     contributors = [],
-    issues = [],
-    readme = null,
-    loading,
-    error,
     languages = {},
     commitActivity = [],
   } = selectedRepo;
 
   const {
-    id,
     node_id,
     name,
-    full_name,
-    isPrivate,
-    ownerLogin,
-    ownerAvatar,
-    ownerHtml,
-    html_url,
     description,
     language,
     stargazers_count,
-    forks_count,
     open_issues_count,
-    licenseName,
-    licenseUrl,
-    default_branch,
-    homepage,
   } = repoInfo || {};
   function commitFormatter(data) {
     let weekInfo = [];
@@ -262,21 +244,18 @@ export default function RepoDetail() {
               {contributors?.map((item, index) => {
                 return (
                   <Card key={index} className="commits-card">
-                    {item.avatar_url ? (
-                      <img
-                        src={item.avatar_url}
-                        style={{
-                          width: "45px",
-                          height: "45px",
-                          margin:'0 5px',
-                          borderRadius: "25px",
-                        }}
-                      />
-                    ) : (
-                      <p className="smiley">☺</p>
-                    )}
+                    <img
+                      src={item.avatar_url}
+                      style={{
+                        width: "45px",
+                        height: "45px",
+                        margin: "0 5px",
+                        borderRadius: "25px",
+                      }}
+                      alt="☺"
+                    />
                     <p style={{ margin: 0 }}>
-                      <a href={item.html_url} target="_blank">
+                      <a href={item.html_url} target="_blank" rel="noopener noreferrer">
                         {item.login}
                       </a>
                     </p>
