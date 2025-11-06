@@ -16,7 +16,14 @@ export const getRepositories = async (query, count_per_page, page_number) => {
     const response = await githubApi.get(
       `/search/repositories?q=${query}&per_page=${count_per_page}&page=${page_number}`
     );
-    return response.data;
+    const result = response.data.items;
+    const languages = result.reduce((acc, curr) => {
+      if (!acc.some((obj) => obj.value === curr.language)) {
+        acc.push({ value: curr.language, label: curr.language });
+      }
+      return acc;
+    }, [{value:"Select Language", label:'Select Language'}]);
+    return { languages, result };
   } catch (err) {
     console.log(err, "error in getRepositories");
     return err.response.data.message;
@@ -60,8 +67,8 @@ export const getRepoIssues = async (owner, repo) => {
 export const getReadme = async (owner, repo) => {
   try {
     const response = await axios.get(
-      // `https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`
-      `https://raw.githubusercontent.com/vig31/scribe-my-notes/main/README.md`
+      `https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`
+      // `https://raw.githubusercontent.com/vig31/scribe-my-notes/main/README.md`
     );
     return response.data;
   } catch (error) {
@@ -107,7 +114,6 @@ export const getRepoCommitActivity = async (owner, repo) => {
 
 export const fetchRepositoriesByNodeIds = async (nodeIds) => {
   try {
-    console.log(nodeIds);
     const query = `
     query {
       nodes(ids: ${JSON.stringify(nodeIds)}) {

@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFavorite } from "../slice/githubApiSlice";
 import AppBar from "./AppBar";
 import { getFavoriteRepos } from "../thunks/gitHubApiThunks";
+import { Oval  } from "react-loader-spinner";
+
 export default function Favourites() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -54,52 +56,65 @@ export default function Favourites() {
           retention and quick access to high-value content.
         </p>
         <div className="repo-detail-card">
-          {favourites?.map((item) => {
-            const isFavorite = localData?.some(
-              (fav) => fav?.id === item?.id || fav === item?.id
-            );
-            return (
-              <Card key={item?.id} className="card-detail">
-                <div className="repo-header">
-                  <h2
-                    className="repo-title"
-                    onClick={() => handleRepoClick(item?.name)}
+          {favourites.length > 0 ? (
+            favourites?.map((item) => {
+              const isFavorite = localData?.some(
+                (fav) => fav?.id === item?.id || fav === item?.id
+              );
+              return (
+                <Card key={item?.id} className="card-detail">
+                  <div className="repo-header">
+                    <h2
+                      className="repo-title"
+                      onClick={() => handleRepoClick(item?.name)}
+                    >
+                      {item?.name}
+                    </h2>
+                    <button
+                      className={`repo-fav-btn ${
+                        isFavorite ? "icon-star-filled" : "icon-star-empty"
+                      }`}
+                      onClick={() => handleFavoriteClick(item?.id)}
+                    >
+                      &#9733;
+                    </button>
+                  </div>
+                  <p>{item?.description}</p>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    {item?.name}
-                  </h2>
-                  <button
-                    className={`repo-fav-btn ${
-                      isFavorite ? "icon-star-filled" : "icon-star-empty"
-                    }`}
-                    onClick={() => handleFavoriteClick(item?.id)}
-                  >
-                    &#9733;
-                  </button>
-                </div>
-                <p>{item?.description}</p>
-                <div
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                >
-                  <span className="repo-lang">
-                    <span
-                      className="repo-lang-dot"
-                      style={{
-                        backgroundColor:
-                          LANGUAGE_COLORS[item?.primaryLanguage?.name] ||
-                          item?.primaryLanguage?.color,
-                      }}
-                    ></span>
-                    {item?.primaryLanguage?.name}
-                  </span>
-                  <p style={{ margin: 0 }}>&#9733; {item?.stargazerCount}</p>
-                  <p style={{ margin: 0 }}>&#127803; {item?.forkCount}</p>
-                  <p style={{ margin: 0 }}>
-                    &#9888; {item?.openIssues?.totalCount}
-                  </p>
-                </div>
-              </Card>
-            );
-          })}
+                    <span className="repo-lang">
+                      <span
+                        className="repo-lang-dot"
+                        style={{
+                          backgroundColor:
+                            LANGUAGE_COLORS[item?.primaryLanguage?.name] ||
+                            item?.primaryLanguage?.color,
+                        }}
+                      ></span>
+                      {item?.primaryLanguage?.name}
+                    </span>
+                    <p style={{ margin: 0 }}>&#9733; {item?.stargazerCount}</p>
+                    <p style={{ margin: 0 }}>&#127803; {item?.forkCount}</p>
+                    <p style={{ margin: 0 }}>
+                      &#9888; {item?.openIssues?.totalCount}
+                    </p>
+                  </div>
+                </Card>
+              );
+            })
+          ) : 
+          (
+            // <Oval 
+            //   height="70"
+            //   width="70"
+            //   radius="5"
+            //   color="green"
+            //   ariaLabel="loading"
+            // />
+            <div></div>
+          )
+          }
         </div>
       </div>
     </div>

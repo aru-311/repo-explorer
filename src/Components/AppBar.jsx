@@ -6,9 +6,14 @@ import { useTheme } from "../themes";
 export default function AppBar() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const handleLogoClick = () => {
+    navigate("/");
+    window.location.reload();
+  };
+
   return (
     <div className="header">
-      <h2 onClick={() => navigate("/")}>
+      <h2 onClick={handleLogoClick}>
         {" "}
         <span className="text-blue-600">&#9733;</span> Repo Explorer
       </h2>
@@ -29,8 +34,8 @@ export default function AppBar() {
           }}
           aria-label="Toggle theme"
         >
-          <p style={{margin:'-11px 10px 5px 10px'}}>
-          {theme === "light" ? "🌙": "🔆"}
+          <p style={{ margin: "-11px 10px 5px 10px" }}>
+            {theme === "light" ? "🌙" : "🔆"}
           </p>
         </button>
 

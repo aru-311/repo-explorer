@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./AppBar.css";
 import { Input, Select, Card } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -9,13 +9,26 @@ import {
   setPageNumber,
   toggleFavorite,
 } from "../slice/githubApiSlice";
-import { getFavoriteRepos, getRepositoriesThunks } from "../thunks/gitHubApiThunks";
+import {
+  getFavoriteRepos,
+  getRepositoriesThunks,
+} from "../thunks/gitHubApiThunks";
 import { debounce } from "lodash";
 
 export default function RepoCard() {
   const dispatch = useDispatch();
-  const { query, repositories=[], totalCount, pageNumber, favourites=[], loading } =
-    useSelector((state) => state.gitRepoSlice);
+  const {
+    query,
+    repositories = [],
+    totalCount,
+    pageNumber,
+    favourites = [],
+    loading,
+    languageSet = [],
+  } = useSelector((state) => state.gitRepoSlice);
+
+  const [internalRepo, setInternalRepo] = useState([]);
+  const [selectedLang, setSelectedLang] = useState("");
 
   const navigate = useNavigate();
 
@@ -54,19 +67,23 @@ export default function RepoCard() {
     };
   }, [debouncedSearch]);
 
-  // const localData = JSON.parse(sessionStorage.getItem("repositories"));
-  // useEffect(() => {
-  //   const stored = JSON.parse(sessionStorage.getItem("repositories"));
-  //   const nodeIds = stored?.map((item) => item) || [];
-  //   if (nodeIds.length) {
-  //     dispatch(getFavoriteRepos(nodeIds));
-  //   }
-  // }, [dispatch]);
+  useEffect(() => {
+    setInternalRepo(repositories);
+  }, [repositories]);
 
   const handleQueryChange = (e) => {
     const value = e.target.value;
     dispatch(setQuery(value));
     debouncedSearch(value);
+  };
+
+  const handleFilters = (value) => {
+    setSelectedLang(value);
+    if (value && value != "Select Language") {
+      setInternalRepo(repositories.filter((item) => item.language === value));
+    } else {
+      setInternalRepo(repositories);
+    }
   };
 
   const handleRepoClick = useCallback(
@@ -98,18 +115,17 @@ export default function RepoCard() {
           />
           <Select
             defaultValue="Filter by Languages"
+            value={selectedLang?.length>0 ? selectedLang:"Filter by Languages"}
             style={{ width: 200, height: 40, marginLeft: 20 }}
-            onChange={(value) => console.log(`selected ${value}`)}
-            options={[
-              { value: "javascript", label: "Javascript" },
-              { value: "C++", label: "C++" },
-              { value: "HTML", label: "HTML" },
-            ]}
+            onChange={(value) => handleFilters(value)}
+            options={languageSet}
           />
         </div>
         <div className="repo-detail-card">
-          {repositories?.map((item) => {
-            const isFavorite = favourites.some((fav) => fav.id === item.node_id || fav === item.node_id);
+          {internalRepo?.map((item) => {
+            const isFavorite = favourites.some(
+              (fav) => fav.id === item.id || fav === item.node_id
+            );
             return (
               <Card key={item.id} className="card-detail">
                 <div className="repo-header">

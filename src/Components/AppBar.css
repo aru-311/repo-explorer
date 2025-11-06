@@ -38,13 +38,14 @@
 .repo-detail-card {
     display: flex;
     flex-wrap: wrap;
+    /* justify-content: center; */
 }
 
 .card-detail {
     margin: 15px;
-    min-width: 250;
+    min-width: 300;
     max-width: 350px;
-    min-height: 100;
+    min-height: 200;
     max-height: 250px;
     width: auto;
     height: auto;
@@ -134,7 +135,11 @@
 
 .commits-card {
     width: 150px;
-    height: 150px;    
+    height: 150px;  
+    display: flex;
+    justify-content: center;  
+    align-items: center;
+    padding: 0;
 }
 
 body {
@@ -179,4 +184,48 @@ button:hover {
     height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+#details-unfavorite-btn {
+  display: inline-flex;            
+  align-items: center;
+  gap: 0.5rem;
+  color: #9ca3af;                  
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  vertical-align: middle;
+  transition: color 150ms ease-in-out, transform 150ms ease-in-out;
+  transform-origin: center center; 
+}
+
+#details-unfavorite-btn:hover {
+  color: #ef4444;                  
+  transform: none;                
+}
+
+#details-favorite-btn {
+  color: #ef4444;                 
+  transform: none;    
+  background: none;
+  border: none; 
+  vertical-align: middle;
+  font-size: 16px;
+  cursor: pointer;           
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(6, auto);
+  /* background-color: dodgerblue; */
+  padding: 5px;
+  gap: 15px;
+}
+.container Card {
+  background-color: #f1f1f1;
+  color: #000;
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
 }

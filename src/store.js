@@ -4,12 +4,10 @@ import { loadFromLocalStorage, saveToLocalStorage } from './Utils/localStorage';
 
 // Load persisted favourites from localStorage
 const persistedFavourites = loadFromLocalStorage('favourites');
-// const persistedRepositories = loadFromLocalStorage('repositories');
 const preloadedState = {
   gitRepoSlice: {
     ...githubApiInitialState,
     favourites: persistedFavourites || githubApiInitialState.favourites,
-    // repositories: persistedRepositories || githubApiInitialState.repositories,
   },
 };
 
@@ -26,9 +24,7 @@ const store = configureStore({
 store.subscribe(() => {
   const state = store.getState();
   const favourites = state.gitRepoSlice?.favourites || []; // <-- safe access
-  // const repositories = state.gitRepoSlice?.repositories || []; // <-- safe access
   saveToLocalStorage('favourites', favourites);
-  // saveToLocalStorage('repositories', repositories);
 });
 
 

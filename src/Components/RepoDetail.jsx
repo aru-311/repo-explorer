@@ -13,7 +13,6 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
-
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
@@ -24,7 +23,7 @@ import {
   getRepoCommitActivityThunks,
   getRepoLanguagesThunks,
 } from "../thunks/gitHubApiThunks";
-import { clearSelectedRepo } from "../slice/githubApiSlice";
+import { clearSelectedRepo, toggleFavorite } from "../slice/githubApiSlice";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -41,7 +40,10 @@ ChartJS.register(
 export default function RepoDetail() {
   const dispatch = useDispatch();
   const { logininfo, reponame } = useParams();
-  const { selectedRepo } = useSelector((state) => state.gitRepoSlice);
+  const { selectedRepo, favourites = [] } = useSelector(
+    (state) => state.gitRepoSlice
+  );
+  const [favoriteItems, setFavoriteIems] = useState([]);
   useEffect(() => {
     dispatch(getRepoInfoThunks({ owner: logininfo, repo: reponame }));
     dispatch(getContributorsThunks({ owner: logininfo, repo: reponame }));
@@ -49,7 +51,7 @@ export default function RepoDetail() {
     dispatch(getReadmeThunks({ owner: logininfo, repo: reponame }));
     dispatch(getRepoCommitActivityThunks({ owner: logininfo, repo: reponame }));
     dispatch(getRepoLanguagesThunks({ owner: logininfo, repo: reponame }));
-
+    setFavoriteIems(localStorage.getItem("favourites"));
     return () => {
       dispatch(clearSelectedRepo()); // cleanup on unmount
     };
@@ -66,9 +68,9 @@ export default function RepoDetail() {
     commitActivity = [],
   } = selectedRepo;
 
-
   const {
     id,
+    node_id,
     name,
     full_name,
     isPrivate,
@@ -86,7 +88,6 @@ export default function RepoDetail() {
     default_branch,
     homepage,
   } = repoInfo || {};
-
   function commitFormatter(data) {
     let weekInfo = [];
     let commitCount = [];
@@ -98,6 +99,9 @@ export default function RepoDetail() {
 
     return { weekInfo, commitCount };
   }
+  const handleFavoriteClick = (id) => {
+    dispatch(toggleFavorite(id));
+  };
   const { weekInfo, commitCount } = commitFormatter(commitActivity);
 
   const labels = Object.keys(languages || {});
@@ -140,7 +144,7 @@ export default function RepoDetail() {
     labels: weekInfo,
     datasets: [
       {
-        label: "sample",
+        label: "Commits",
         data: commitCount[1] === 0 ? [2, 4, 6, 8, 10] : commitCount,
         backgroundColor: "rgba(54, 162, 235, 0.7)",
       },
@@ -213,9 +217,18 @@ export default function RepoDetail() {
               <p style={{ margin: 5 }}>
                 &#9888; {open_issues_count} Open Issues
               </p>
-              <h2 className="search-icon" style={{ marginTop: "0px" }}>
-                <span>&#10084;</span>Add to Favorites
-              </h2>
+              <button
+                id={`${
+                  favourites.includes(node_id)
+                    ? "details-favorite-btn"
+                    : "details-unfavorite-btn"
+                }`}
+                onClick={() => handleFavoriteClick(node_id)}
+              >
+                {favourites.includes(node_id)
+                  ? "❤ Remove from Favorites"
+                  : "❤ Add to Favorites"}
+              </button>
             </div>
             <h2>{name}</h2>
             <hr />
@@ -245,7 +258,7 @@ export default function RepoDetail() {
               Key individuals who drive the project forward, measured by their
               total contribution count.
             </p>
-            <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+            <div className="container">
               {contributors?.map((item, index) => {
                 return (
                   <Card key={index} className="commits-card">
@@ -255,6 +268,7 @@ export default function RepoDetail() {
                         style={{
                           width: "45px",
                           height: "45px",
+                          margin:'0 5px',
                           borderRadius: "25px",
                         }}
                       />
@@ -266,7 +280,11 @@ export default function RepoDetail() {
                         {item.login}
                       </a>
                     </p>
-                    <p style={{ margin: 0 }}>{item.contributions === 0 || 1 ? '1 commit' :` ${item.contributions} commits` }</p>
+                    <p style={{ margin: 0 }}>
+                      {item.contributions === 0 || 1
+                        ? "1 commit"
+                        : ` ${item.contributions} commits`}
+                    </p>
                   </Card>
                 );
               })}

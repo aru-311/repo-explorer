@@ -17,6 +17,7 @@ export const initialState = {
   totalCount: 0,
   query: "",
   pageNumber: 1,
+  languageSet:[],
   favourites: [], // For homepage cards
   selectedRepo: {
     // For repo detail page
@@ -71,7 +72,8 @@ const githubSlice = createSlice({
       })
       .addCase(getRepositoriesThunks.fulfilled, (state, action) => {
         state.loading = false;
-        state.repositories = action.payload.items;
+        state.repositories = action.payload.result;
+        state.languageSet = action.payload.languages;
       })
       .addCase(getRepositoriesThunks.rejected, (state, action) => {
         state.loading = false;
