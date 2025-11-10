@@ -51,4 +51,9 @@ To run the app in development mode:
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload when you make changes.
+Open [https://gitrepo-explorer.netlify.app/](https://gitrepo-explorer.netlify.app/) to view it in your browser. The page will reload when you make changes.
+
+
+https://github.com/user-attachments/assets/3e30a713-5274-45df-9269-cc76fcfb4366
+
+
